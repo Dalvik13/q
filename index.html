@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система безопасности</title>
+    <style>
+        body { background-color: #111; color: #0f0; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { border: 2px solid #0f0; padding: 30px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
+        input { background: #000; border: 1px solid #0f0; color: #0f0; padding: 10px; font-size: 16px; width: 80%; margin-bottom: 15px; text-align: center; text-transform: uppercase; }
+        button { background: #0f0; color: #000; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #0c0; }
+        #secret { display: none; margin-top: 20px; border-top: 1px dashed #0f0; padding-top: 15px; color: #fff; }
+        #error { color: #f33; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>ДОСТУП ОГРАНИЧЕН</h2>
+        <p>Введите код доступа:</p>
+        <input type="text" id="passInput" placeholder="КОД">
+        <br>
+        <button onclick="checkPass()">ПРОВЕРИТЬ</button>
+        <p id="error">НЕВЕРНЫЙ КОД!</p>
+        <div id="secret">
+            <h3>ДОСТУП РАЗРЕШЕН</h3>
+            <p>Следующая подсказка спрятана под старым дубом. Код от физического замка: <b>4815</b>.</p>
+        </div>
+    </div>
+
+    <script>
+        // Сюда вставьте ваш SHA-256 хеш (в нижнем регистре)
+        const correctHash = "ВСТАВЬТЕ_СЮДА_ВАШ_ХЕШ";
+
+        async function checkPass() {
+            const input = document.getElementById('passInput').value.trim().toUpperCase();
+            const msgUint8 = new TextEncoder().encode(input);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            if (hashHex === correctHash) {
+                document.getElementById('secret').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+            } else {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('secret').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
